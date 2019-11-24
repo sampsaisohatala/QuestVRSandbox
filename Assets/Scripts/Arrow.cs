@@ -12,16 +12,20 @@ public class Arrow : MonoBehaviour
     void Awake()
     {
         m_Rigidbody = GetComponent<Rigidbody>();
+        transform.localPosition = new Vector3(0, 0, 0.425f);
+        transform.localEulerAngles = Vector3.zero;
+        Debug.Log("AA: pos: " + transform.localPosition + " / rot: " + transform.localEulerAngles);
     }
 
     void FixedUpdate()
     {
-        if (m_IsStoppped)
+        if (m_IsStoppped)        
             return;
 
-        m_Rigidbody.MoveRotation(Quaternion.LookRotation(m_Rigidbody.velocity, transform.up));
+        if (m_Rigidbody.velocity != Vector3.zero)
+             m_Rigidbody.MoveRotation(Quaternion.LookRotation(m_Rigidbody.velocity, transform.up));
 
-        if(Physics.Linecast(m_LastPositon, m_Tip.position))
+        if (Physics.Linecast(m_LastPositon, m_Tip.position))
         {
             Stop();
         }
