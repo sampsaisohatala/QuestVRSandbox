@@ -120,33 +120,4 @@ public class Bow : MonoBehaviour
         if (!m_CurrentArrow)
             StartCoroutine(CreateArrow(arrowCreationDelay));
     }
-
-    /*
-    void GrabBow()
-    {
-        transform.parent = leftHand;
-        transform.localPosition = Vector3.zero;
-        transform.localEulerAngles = Vector3.zero;
-        m_Rigidbody.isKinematic = true;
-        m_Rigidbody.useGravity = false;
-        inUse = true;
-    }
-
-    void UnGrabBow()
-    {
-        transform.parent = null;
-        m_Rigidbody.isKinematic = false;
-        m_Rigidbody.useGravity = true;
-        inUse = false;
-    }
-
-    void OnTriggerStay(Collider other)
-    {
-        if (OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger, m_Controller))
-            GrabBow();
-
-        if (OVRInput.GetUp(OVRInput.Button.PrimaryIndexTrigger, m_Controller))
-            UnGrabBow();
-    }
-    */
 }

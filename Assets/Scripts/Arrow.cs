@@ -6,15 +6,21 @@ public class Arrow : MonoBehaviour
     public Transform m_Tip = null;
 
     Rigidbody m_Rigidbody = null;
-    bool m_IsStoppped = false;
+    bool m_IsStoppped = true;
     Vector3 m_LastPositon = Vector3.zero;
+
+    [SerializeField] int damage = 5;
 
     void Awake()
     {
         m_Rigidbody = GetComponent<Rigidbody>();
         transform.localPosition = new Vector3(0, 0, 0.425f);
         transform.localEulerAngles = Vector3.zero;
-        Debug.Log("AA: pos: " + transform.localPosition + " / rot: " + transform.localEulerAngles);
+    }
+
+    void Start()
+    {
+        //m_LastPositon = transform.position;
     }
 
     void FixedUpdate()
@@ -25,23 +31,44 @@ public class Arrow : MonoBehaviour
         if (m_Rigidbody.velocity != Vector3.zero)
              m_Rigidbody.MoveRotation(Quaternion.LookRotation(m_Rigidbody.velocity, transform.up));
 
-        if (Physics.Linecast(m_LastPositon, m_Tip.position))
-        {
-            Stop();
-        }
+        RaycastHit hit;
+        if (Physics.Linecast(m_LastPositon, m_Tip.position, out hit))
+            Stop(hit.collider.gameObject);
 
         m_LastPositon = m_Tip.position;
     }
 
-    void Stop()
+    void Stop(GameObject hitObject)
     {
+        Debug.Log("Stop with: " + hitObject.name);
         m_IsStoppped = true;
+
+        transform.parent = hitObject.transform;
+
         m_Rigidbody.isKinematic = true;
         m_Rigidbody.useGravity = false;
+
+        CheckForDamage(hitObject);
+    }
+
+    void CheckForDamage(GameObject hitObject)
+    {
+        MonoBehaviour[] behaviours = hitObject.GetComponents<MonoBehaviour>();
+
+        foreach (MonoBehaviour behaviour in behaviours)
+        {
+            if(behaviour is IDamageable)
+            {
+                IDamageable damageable = (IDamageable)behaviour;
+                damageable.Damage(damage);
+                break;
+            }
+        }
     }
 
     public void Fire(float pullValue)
     {
+        m_LastPositon = m_Tip.position;
         m_IsStoppped = false;
         transform.parent = null;
         m_Rigidbody.isKinematic = false;
