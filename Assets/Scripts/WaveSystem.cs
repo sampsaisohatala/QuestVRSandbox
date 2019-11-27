@@ -11,11 +11,16 @@ public class WaveSystem : MonoBehaviour
     [SerializeField] int waveNumber = 1;
     [SerializeField] int enemiesAddedToNextRound = 5;
 
-    int numberOfEnemies;
-    int enemiesKilled;
+    int enemiesInWave;
+    int enemiesKilledInWave = 0;
+    int totalEnemiesKilled = 0;
+
+    CarryMenu carryMenu;
 
     void Start()
     {
+        carryMenu = GameManager.Instance.CarryMenu;
+        Debug.Log(carryMenu);
         StartCoroutine(WaitForNextWave());
     }
 
@@ -27,8 +32,10 @@ public class WaveSystem : MonoBehaviour
 
     IEnumerator ActivateWave()
     {
-        numberOfEnemies = waveNumber * enemiesAddedToNextRound;
-        for (int i = 0; i < numberOfEnemies; i++)
+        carryMenu.RefreshWaveCount(waveNumber);
+
+        enemiesInWave = waveNumber * enemiesAddedToNextRound;
+        for (int i = 0; i < enemiesInWave; i++)
         {
             float random = Random.Range(0.5f, 2f);
             yield return new WaitForSeconds(random);
@@ -44,17 +51,30 @@ public class WaveSystem : MonoBehaviour
 
     public void EnemyKilled()
     {
-        enemiesKilled++;
+        enemiesKilledInWave++;
+        totalEnemiesKilled++;
+        carryMenu.RefreshKillCount(totalEnemiesKilled);
 
-        if (enemiesKilled == numberOfEnemies)
+        if (enemiesKilledInWave == enemiesInWave)
             WaveCompleted();
     }
 
     void WaveCompleted()
     {
-        Debug.Log("Wave " + waveNumber + " Completed: " + enemiesKilled);
-        enemiesKilled = 0;
+        Debug.Log("Wave " + waveNumber + " Completed: " + enemiesKilledInWave);
+        enemiesKilledInWave = 0;
         waveNumber++;
         StartCoroutine(WaitForNextWave());
+    }
+
+    void OnDrawGizmos()
+    {
+        // Draw a semitransparent blue wirecube at the transforms position
+        Gizmos.color = Color.blue;
+        foreach (var point in SpawnPoints)
+        {
+            Gizmos.DrawWireCube(point.position + Vector3.up, new Vector3(1, 2, 1));
+        }
+        
     }
 }

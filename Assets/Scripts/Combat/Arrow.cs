@@ -8,6 +8,7 @@ public class Arrow : MonoBehaviour
     Rigidbody m_Rigidbody = null;
     bool m_IsStoppped = true;
     Vector3 m_LastPositon = Vector3.zero;
+    GameObject m_Trail = null;
 
     [SerializeField] int damage = 5;
 
@@ -16,6 +17,8 @@ public class Arrow : MonoBehaviour
         m_Rigidbody = GetComponent<Rigidbody>();
         transform.localPosition = new Vector3(0, 0, 0.425f);
         transform.localEulerAngles = Vector3.zero;
+        m_Trail = transform.Find("Trail").gameObject;
+        m_Trail.SetActive(false);
     }
 
     void Start()
@@ -42,6 +45,7 @@ public class Arrow : MonoBehaviour
     {
         Debug.Log("Stop with: " + hitObject.name);
         m_IsStoppped = true;
+        m_Trail.SetActive(false);
 
         transform.parent = hitObject.transform;
 
@@ -74,7 +78,7 @@ public class Arrow : MonoBehaviour
         m_Rigidbody.isKinematic = false;
         m_Rigidbody.useGravity = true;
         m_Rigidbody.AddForce(transform.forward * (pullValue * m_Speed));
-
+        m_Trail.SetActive(true);
         Destroy(gameObject, 5f);
     }
 }

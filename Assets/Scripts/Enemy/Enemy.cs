@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class Enemy : MonoBehaviour
 {
@@ -10,25 +11,18 @@ public class Enemy : MonoBehaviour
     [SerializeField] float m_MoveSpeed = 1f;
 
     Transform m_Target = null;
+    NavMeshAgent m_Agent;
 
     void Awake()
-    {
+    {       
         SetupBodyParts();
     }
 
     void Start()
     {
-        m_Target = GameObject.Find("Player").transform;
-    }
-
-    void Update()
-    {
-        Move();
-    }
-
-    void Move()
-    {
-        transform.position = Vector3.MoveTowards(transform.position, m_Target.position, m_MoveSpeed * Time.deltaTime);
+        m_Agent = GetComponent<NavMeshAgent>();
+        m_Target = GameManager.Instance.Player.transform;
+        m_Agent.SetDestination(m_Target.position);
     }
 
     void SetupBodyParts()
@@ -52,8 +46,9 @@ public class Enemy : MonoBehaviour
 
     public void Kill()
     {
+        m_Agent.isStopped = true;
         Alive = false;
-        GameObject.Find("_GameManager").GetComponent<WaveSystem>().EnemyKilled();
+        GameManager.Instance.WaveSystem.EnemyKilled();
         Destroy(gameObject);
     }
 
